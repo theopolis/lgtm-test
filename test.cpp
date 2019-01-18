@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int tainted_int() {
     return 42;
@@ -15,14 +16,12 @@ void int_overflow() {
 }
 
 void int_truncation() {
-    int a = 0;
-    short b = 0;
-}
-
-void int_truncation_arith() {
-    int a = 0;
-    int b = 0;
-    short c = a + b;
+    int a = tainted_int();
+    short b = a;
+    
+    int c = tainted_int();
+    int d = 0;
+    short e = c + d;
 }
 
 void int_overflow_loop() {
@@ -38,7 +37,8 @@ char* stack_return() {
     return foo;
 }
 
-void malloc() {
+void uncontrolled_malloc() {
+	malloc(tainted_int());
 }
 
 void format_string() {

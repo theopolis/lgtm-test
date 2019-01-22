@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Trigger rebuild1
-
+char* tainted_str() {
+    char *buf = (char*)malloc(32);
+    gets(buf);
+    return buf;
+}
 
 int tainted_int() {
-    return 42;
+    return strtoul(tainted_str(), NULL, 10);
 }
 
 void int_overflow() {
@@ -21,7 +24,7 @@ void int_overflow() {
 void int_truncation() {
     int a = tainted_int();
     short b = a;
-    
+
     int c = tainted_int();
     int d = 0;
     short e = c + d;
@@ -41,7 +44,7 @@ char* stack_return() {
 }
 
 void uncontrolled_malloc() {
-	malloc(tainted_int());
+    malloc(tainted_int());
 }
 
 void format_string() {

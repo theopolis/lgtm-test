@@ -1,0 +1,27 @@
+import semmle.code.cpp.dataflow.DataFlow
+
+class GetUserInputToMySystem extends DataFlow::Configuration {
+  GetUserInputToMySystem() { this = "GetUserInputToMySystem" }
+
+  override predicate isSource(DataFlow::Node source) {
+    exists (Function get_user_input |
+      source.asExpr().(FunctionCall).getTarget() = get_user_input and
+      get_user_input.hasQualifiedName("get_user_input")
+    )
+  }
+
+  override predicate isSink(DataFlow::Node sink) {
+    exists (FunctionCall fc |
+      sink.asExpr() = fc.getArgument(0) and
+      fc.getTarget().hasQualifiedName("my_system")
+    )
+  }
+}
+
+from Expr get_user_input, Expr my_system, GetUserInputToMySystem config
+where config.hasFlow(DataFlow::exprNode(get_user_input), DataFlow::exprNode(my_system))
+select my_system, "This 'my_system' uses data from $@.",
+  get_user_input, "call to 'get_user_input'"
+
+
+

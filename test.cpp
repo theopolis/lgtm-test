@@ -3,7 +3,7 @@
 
 char* tainted_str() {
     char *buf = (char*)malloc(32);
-    gets(buf);
+    // gets(buf);
     return buf;
 }
 

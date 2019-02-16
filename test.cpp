@@ -95,5 +95,5 @@ int main() {
     auto cmd_char = get_user_input_char();
     my_prop(cmd_char);
     my_prop_char(cmd_char);
-    my_system_char(cmd_char);
+    // my_system_char(cmd_char);
 }

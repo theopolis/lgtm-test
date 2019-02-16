@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 char* tainted_str() {
     char *buf = (char*)malloc(32);
@@ -59,9 +60,40 @@ void sprintf_return_val() {
     sprintf(buf, "%s", "ABCDEFG");
 }
 
-// TODO: using struct without memset?
+void my_system(std::string cmd) {
+    system(cmd.c_str());
+}
+
+void my_system_char(const char* cmd) {
+    system(cmd);
+}
+
+std::string get_user_input() {
+    return "world'; ls -la; echo 'goodbye";
+}
+
+const char* get_user_input_char() {
+    return "world'; ls -la; echo 'goodbye";
+}
+
+template<typename T>
+void my_prop(T cmd) {
+    my_system(cmd);
+}
+
+void my_prop_char(const char* cmd) {
+    my_system_char(cmd);
+}
 
 int main() {
     // Not sure if this actually needs to be called to be detected?
     stack_return()[0];
+
+    auto cmd = get_user_input();
+    my_prop(cmd);
+
+    auto cmd_char = get_user_input_char();
+    my_prop(cmd_char);
+    my_prop_char(cmd_char);
+    my_system_char(cmd_char);
 }

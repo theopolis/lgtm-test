@@ -1,3 +1,5 @@
+==== Does not work
+
 import semmle.code.cpp.dataflow.DataFlow
 
 class GetUserInputToMySystem extends DataFlow::Configuration {
@@ -24,4 +26,32 @@ select my_system, "This 'my_system' uses data from $@.",
   get_user_input, "call to 'get_user_input'"
 
 
+==== Does work
 
+import semmle.code.cpp.dataflow.DataFlow
+
+class GetUserInputToMySystem extends DataFlow::Configuration {
+  GetUserInputToMySystem() { this = "GetUserInputToMySystem" }
+
+  override predicate isSource(DataFlow::Node source) {
+    exists (Function get_user_input_char |
+      source.asExpr().(FunctionCall).getTarget() = get_user_input_char and
+      get_user_input_char.hasQualifiedName("get_user_input_char")
+    )
+  }
+
+  override predicate isSink(DataFlow::Node sink) {
+    exists (FunctionCall fc |
+      sink.asExpr() = fc.getArgument(0) and
+      fc.getTarget().hasName("my_system_char")
+    )
+  }
+}
+
+from Expr get_user_input_char, Expr my_system_char, GetUserInputToMySystem config
+where config.hasFlow(DataFlow::exprNode(get_user_input_char), DataFlow::exprNode(my_system_char))
+select my_system_char, "This 'my_system_char' uses data from $@.",
+  get_user_input_char, "call to 'get_user_input_char'"
+
+
+==== NB: query console tries to replace semmle with cpp
